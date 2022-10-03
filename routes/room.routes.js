@@ -6,11 +6,24 @@ const Room = require("../models/Room.model");
 const fileUploader = require("../config/cloudinary.config");
 const Item = require("../models/Item.model");
 
+router.post("/upload", fileUploader.single("imageUrl"), (req, res, next) => {
+  // console.log("file is: ", req.file)
+ 
+  if (!req.file) {
+    next(new Error("No file uploaded!"));
+    return;
+  }
+  
+  // Get the URL of the uploaded file and send it as a response.
+  // 'fileUrl' can be any name, just make sure you remember to use the same when accessing it on the frontend
+  
+  res.json({ imageUrl: req.file.path });
+});
 //  POST /api/projects  -  Creates a new project
-router.post("/rooms", fileUploader.single("imageUrl"), (req, res, next) => {
-  const { title, description } = req.body;
+router.post("/rooms", (req, res, next) => {
+  const { title, description, imageUrl, owner } = req.body;
   console.log(req.body);
-  Room.create({ owner: req.session.user, title, description, imageUrl: req.file.path, items: [] })
+  Room.create({ title, description, imageUrl,  owner, items: [] })
     .then((response) => res.json(response))
     .catch((err) => res.json(err));
 });
@@ -18,7 +31,7 @@ router.post("/rooms", fileUploader.single("imageUrl"), (req, res, next) => {
 //  GET /api/projects -  Retrieves all of the projects
 router.get("/rooms", (req, res, next) => {
   Room.find()
-    .populate("owner") // .populate("owner")
+    .populate("owner")
     .then((allRooms) => res.json(allRooms))
     .catch((err) => res.json(err));
 });
@@ -35,7 +48,7 @@ router.get("/rooms/:roomId", (req, res, next) => {
   // Each Project document has `tasks` array holding `_id`s of Task documents
   // We use .populate() method to get swap the `_id`s for the actual Task documents
   Room.findById(roomId)
-    .populate("owner") // .populate("owner")
+    .populate("owner")
     .then((room) => res.status(200).json(room))
     .catch((error) => res.json(error));
 });

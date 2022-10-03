@@ -20,8 +20,10 @@ require("./config")(app);
 // const allRoutes = require("./routes");
 // app.use("/api", allRoutes);
 
-const moviesRouter = require('./routes/movies.routes'); // <== has to be added
-app.use('/api', moviesRouter); // <== has to be added
+// const moviesRouter = require('./routes/movies.routes'); // <== has to be added
+// app.use('/api', moviesRouter); // <== has to be added
+const authRouter = require("./routes/auth.routes");
+app.use("/auth", authRouter);
 
 const roomRouter = require("./routes/room.routes");
 app.use("/api", isAuthenticated, roomRouter);
@@ -29,13 +31,10 @@ app.use("/api", isAuthenticated, roomRouter);
 const itemRouter = require("./routes/item.routes");
 app.use("/api", isAuthenticated, itemRouter);
 
-const authRouter = require("./routes/auth.routes");
-app.use("/auth", authRouter);
+
 
 const index = require('./routes/index.routes'); // <== already included
 app.use('/', index); // <== already included
-
-
 
 
 require("./error-handling")(app);

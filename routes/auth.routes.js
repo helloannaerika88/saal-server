@@ -13,6 +13,7 @@ const saltRounds = 10;
 router.post('/signup', (req, res, next) => {
   const { email, password, name } = req.body;
   // Check if email or password or name are provided as empty string 
+ 
   if (email === '' || password === '' || name === '') {
     res.status(400).json({ message: "Provide email, password and name" });
     return;
@@ -45,13 +46,12 @@ router.post('/signup', (req, res, next) => {
       // If email is unique, proceed to hash the password
       const salt = bcrypt.genSaltSync(saltRounds);
       const hashedPassword = bcrypt.hashSync(password, salt);
-
       // Create the new user in the database
-      // We return a pending promise, which allows us to chain another `then` 
-      return User.create({ email, password: hashedPassword, name });
+      // We return a pending promise, which allows us to chain another `then`
+      return User.create({ name, email, password: hashedPassword }) 
     })
     .then((createdUser) => {
-    
+      console.log("test 2")
       const { email, name, _id } = createdUser;
     
       // Create a new object that doesn't expose the password
