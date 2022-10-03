@@ -3,11 +3,12 @@ const router = express.Router();
 const mongoose = require("mongoose");
 
 const Room = require("../models/Room.model");
+const fileUploader = require("../config/cloudinary.config");
 const Item = require("../models/Item.model");
 
 //  POST /api/projects  -  Creates a new project
-router.post("/rooms", (req, res, next) => {
-  const { title, description } = req.body;
+router.post("/rooms", fileUploader.single("imageUrl"), (req, res, next) => {
+  const { title, description, imageUrl } = req.body;
   console.log(req.body);
   Room.create({ title, description, items: [] })
     .then((response) => res.json(response))
