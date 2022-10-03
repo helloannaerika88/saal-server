@@ -8,9 +8,9 @@ const Item = require("../models/Item.model");
 
 //  POST /api/projects  -  Creates a new project
 router.post("/rooms", fileUploader.single("imageUrl"), (req, res, next) => {
-  const { title, description, imageUrl } = req.body;
+  const { title, description } = req.body;
   console.log(req.body);
-  Room.create({ title, description, items: [] })
+  Room.create({ owner: req.session.user, title, description, imageUrl: req.file.path, items: [] })
     .then((response) => res.json(response))
     .catch((err) => res.json(err));
 });
@@ -18,7 +18,7 @@ router.post("/rooms", fileUploader.single("imageUrl"), (req, res, next) => {
 //  GET /api/projects -  Retrieves all of the projects
 router.get("/rooms", (req, res, next) => {
   Room.find()
-    .populate("items")
+    .populate("owner") // .populate("owner")
     .then((allRooms) => res.json(allRooms))
     .catch((err) => res.json(err));
 });
@@ -35,7 +35,7 @@ router.get("/rooms/:roomId", (req, res, next) => {
   // Each Project document has `tasks` array holding `_id`s of Task documents
   // We use .populate() method to get swap the `_id`s for the actual Task documents
   Room.findById(roomId)
-    .populate("items")
+    .populate("owner") // .populate("owner")
     .then((room) => res.status(200).json(room))
     .catch((error) => res.json(error));
 });

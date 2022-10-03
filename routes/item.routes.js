@@ -4,13 +4,15 @@ const mongoose = require("mongoose");
 
 const Room = require("../models/Room.model");
 const Item = require("../models/Item.model");
+const fileUploader = require("../config/cloudinary.config");
+
 
 
 //  POST /api/tasks  -  Creates a new task
-router.post("/items", (req, res, next) => {
+router.post("/items", fileUploader.single("imageUrl"), (req, res, next) => {
   const { title, description, roomId } = req.body;
 
-  Item.create({ title, description, room: roomId })
+  Item.create({ owner: req.session.user, title, description, imageUrl: req.file.path, room: roomId })
     .then((newItem) => {
       return Room.findByIdAndUpdate(roomId, {
         $push: { items: newItem._id },
@@ -34,7 +36,7 @@ router.get("/items/:itemId", (req, res, next) => {
 
   Item.findById(itemId)
     .populate("room")
-    .then((task) => res.json(task))
+    .then((item) => res.json(item))
     .catch((error) => res.json(error));
 });
 
