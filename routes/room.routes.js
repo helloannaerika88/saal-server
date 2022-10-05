@@ -48,7 +48,7 @@ router.get("/rooms/:roomId", (req, res, next) => {
   // Each Project document has `tasks` array holding `_id`s of Task documents
   // We use .populate() method to get swap the `_id`s for the actual Task documents
   Room.findById(roomId)
-    .populate("owner")
+    .populate("owner items")
     .then((room) => res.status(200).json(room))
     .catch((error) => res.json(error));
 });

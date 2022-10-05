@@ -6,13 +6,25 @@ const Room = require("../models/Room.model");
 const Item = require("../models/Item.model");
 const fileUploader = require("../config/cloudinary.config");
 
-
+router.post("/upload", fileUploader.single("imageUrl"), (req, res, next) => {
+  // console.log("file is: ", req.file)
+ 
+  if (!req.file) {
+    next(new Error("No file uploaded!"));
+    return;
+  }
+  
+  // Get the URL of the uploaded file and send it as a response.
+  // 'fileUrl' can be any name, just make sure you remember to use the same when accessing it on the frontend
+  
+  res.json({ imageUrl: req.file.path });
+});
 
 //  POST /api/tasks  -  Creates a new task
-router.post("/items", fileUploader.single("imageUrl"), (req, res, next) => {
-  const { title, description, roomId } = req.body;
+router.post("/items", (req, res, next) => {
+  const { title, description, imageUrl, owner, roomId } = req.body;
 
-  Item.create({ owner: req.session.user, title, description, imageUrl: req.file.path, room: roomId })
+  Item.create({ owner, title, description, imageUrl, room: roomId })
     .then((newItem) => {
       return Room.findByIdAndUpdate(roomId, {
         $push: { items: newItem._id },
@@ -25,7 +37,7 @@ router.post("/items", fileUploader.single("imageUrl"), (req, res, next) => {
 //  GET /api/projects -  Retrieves all of the projects
 router.get("/items", (req, res, next) => {
   Item.find()
-    .populate("items")
+    .populate("room")
     .then((allItems) => res.json(allItems))
     .catch((err) => res.json(err));
 });
