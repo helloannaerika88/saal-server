@@ -2,8 +2,11 @@ const express = require("express");
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 const User = require("../models/User.model");
+const Room = require("../models/Room.model");
+
 
 const { isAuthenticated } = require('../middleware/jwt.middleware.js');
+const { Mongoose } = require("mongoose");
 
 const router = express.Router();
 const saltRounds = 10;
@@ -128,5 +131,16 @@ router.get('/verify', isAuthenticated, (req, res, next) => {
   res.status(200).json(req.payload);
 });
 
+
+// Get route to display all the rooms in user's profile
+router.get('/users/profile', isAuthenticated, (req,res,next) => {
+  const user = req.payload
+  console.log(user);
+  Room.find({owner: user._id})
+  .populate("owner items")
+  .then((allRooms) => res.json(allRooms))
+  .catch((err) => res.json(err));
+}
+);
 
 module.exports = router;
